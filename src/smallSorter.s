@@ -1,25 +1,18 @@
 .globl _start
 _start:
+    xorl %ebp, %ebp
+_count:
     # open file
-    movq $2, %rax
+    movl $2, %eax
     movq 16(%rsp), %rdi
-    xor  %rsi, %rsi
+    xorl %esi, %esi
     syscall
-    movq %rax, %rbx
+    movl %eax, %ebx
 
     # don't check if file was opened successfully
 
     # allocate memory
-    subq $12, %rsp
-
-    xor  %r12, %r12
-_count:
-    # seek start
-    movq $8, %rax
-    movq %rbx, %rdi
-    xor  %rsi, %rsi
-    xor  %rdx, %rdx
-    syscall
+    # sub $12, %rsp
 
 _line:
     xor %r13, %r13
@@ -27,20 +20,21 @@ _line:
     xor %r15, %r15
 _scan:
     # read byte
-    xor  %rax, %rax
-    movq %rbx, %rdi
+    xorl %eax, %eax
+    movl %ebx, %edi
     lea  (%rsp, %r13), %rsi
-    movq $1, %rdx
+    xorl %edx, %edx
+    incl %edx
     syscall
 
-    test %rax, %rax
+    test %eax, %eax
     jz   _file_end
 
     movb (%rsp, %r13), %al
-    inc  %r13
+    incq %r13
 
     subb $'0', %al
-    jb _other
+    js _other
 
     # no need to check if greater than 9
 
@@ -52,30 +46,34 @@ _scan:
 
     jmp  _scan
 _other:
-    movq $1, %r15
+    inc %r15
     
-    cmp $'\t', %al
+    cmpb $('\t' - '0'), %al
     je _scan
 
-    cmp %r12, %r14
+    cmp %ebp, %r14d
     jne _line
 
     # write to stdout
-    movq $1, %rax
-    movq $1, %rdi
+    xorl %eax, %eax
+    incl %eax
+    xorl %edi, %edi
+    incl %edi
     movq %rsp, %rsi
-    movq %r13, %rdx
+    movl %r13d, %edx
     syscall
     jmp  _line
 
 _file_end:
-    inc  %r12
-    cmp  $32768, %r12
-    jl  _count 
+    # close file
+    movl $3, %eax
+    movl %ebx, %edi
+    syscall
 
-    # don't close the file
+    incw %bp
+    jno _count
 
     # exit
-    movq $60, %rax
-    xor  %rdi, %rdi
+    movl $60, %eax
+    xorl %edi, %edi
     syscall
