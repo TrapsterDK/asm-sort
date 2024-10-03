@@ -24,7 +24,8 @@ _count:
 _line:
     xor %r13, %r13
     xor %r14, %r14
-_scan_x:
+    xor %r15, %r15
+_scan:
     # read byte
     xor  %rax, %rax
     movq %rbx, %rdi
@@ -37,30 +38,25 @@ _scan_x:
 
     movb (%rsp, %r13), %al
     inc  %r13
-    cmp  $'\t', %al
-    jne  _scan_x
 
-_scan_y:
-    # read byte
-    xor  %rax, %rax
-    movq %rbx, %rdi
-    lea  (%rsp, %r13), %rsi
-    movq $1, %rdx
-    syscall
-
-    movb (%rsp, %r13), %al
-    inc  %r13
     subb $'0', %al
-    jb _new_line
-    cmpb $9, %al
-    ja _new_line
-    
-    imul $10, %r14, %r14
-    add %rax, %r14
-    
-    jmp  _scan_y
+    jb _other
 
-_new_line:
+    # no need to check if greater than 9
+
+    test %r15, %r15
+    jz _scan
+    
+    imul $10, %r14
+    add %rax, %r14
+
+    jmp  _scan
+_other:
+    movq $1, %r15
+    
+    cmp $'\t', %al
+    je _scan
+
     cmp %r12, %r14
     jne _line
 
