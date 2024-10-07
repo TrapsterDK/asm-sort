@@ -45,7 +45,7 @@ _scan:
     jz   _scan
     
     imulq $10, %r13
-    addb %al, %r13b
+    addq %rax, %r13
 
     jmp  _scan
 _other:
