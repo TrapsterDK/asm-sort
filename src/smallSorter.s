@@ -1,9 +1,12 @@
 .globl _start
 _start:
-    xorl %ebp, %ebp
+    xorq %r12, %r12
 _count:
+    # asume argument 2 is a file name, without checking
+
     # open file
-    movl $2, %eax
+    xorl %eax, %eax
+    xorb $2, %al
     movq 16(%rsp), %rdi
     xorl %esi, %esi
     syscall
@@ -15,14 +18,14 @@ _count:
     # sub $12, %rsp
 
 _line:
-    xor %r13, %r13
-    xor %r14, %r14
-    xor %r15, %r15
+    xorl %ebp, %ebp
+    xorq %r13, %r13
+    xorq %r14, %r14
 _scan:
     # read byte
     xorl %eax, %eax
     movl %ebx, %edi
-    lea  (%rsp, %r13), %rsi
+    leaq (%rsp, %rbp), %rsi
     xorl %edx, %edx
     incl %edx
     syscall
@@ -30,50 +33,54 @@ _scan:
     test %eax, %eax
     jz   _file_end
 
-    movb (%rsp, %r13), %al
-    incq %r13
+    movb (%rsp, %rbp), %al
+    incl %ebp
 
     subb $'0', %al
-    js _other
+    js   _other
 
     # no need to check if greater than 9
 
-    test %r15, %r15
-    jz _scan
+    test %r14, %r14
+    jz   _scan
     
-    imul $10, %r14
-    add %rax, %r14
+    imulq $10, %r13
+    addb %al, %r13b
 
     jmp  _scan
 _other:
-    inc %r15
+    incq %r14
     
-    cmpb $('\t' - '0'), %al
-    je _scan
+    addb $('0' - '\t'), %al
+    je   _scan
 
-    cmp %ebp, %r14d
-    jne _line
+    cmpq %r12, %r13
+    jne  _line
 
     # write to stdout
-    xorl %eax, %eax
-    incl %eax
-    xorl %edi, %edi
-    incl %edi
+    # xorl %eax, %eax  # eax is 1 since \t is 9 and \n is 10
+    # incl %eax
+    movl %eax, %edi # eax is already 1
+    #xorl %edi, %edi
+    #incl %edi
     movq %rsp, %rsi
-    movl %r13d, %edx
+    movl %ebp, %edx
     syscall
     jmp  _line
 
 _file_end:
     # close file
-    movl $3, %eax
+    # xorl %eax, %eax # read() returns 0 when end of file
+    # xorl %eax, %eax
+    xorb $3, %al
     movl %ebx, %edi
     syscall
 
-    incw %bp
-    jno _count
+    incw %r12w
+    jno  _count
 
     # exit
-    movl $60, %eax
+    # xorl %eax, %eax  # close() returns 0 (when closed successfully) 
+    xorb $60, %al
     xorl %edi, %edi
     syscall
