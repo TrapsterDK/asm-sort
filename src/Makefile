@@ -7,13 +7,18 @@ sorter: $(OBJS)
 	ld --discard-all --relax --strip-all -o sorter $^
 	
 smallSorter: $(SMALL_OBJS)
-	ld --discard-all --relax --strip-all -N -o smallSorter $^
-	
-	
-size: smallSorter
-	du -sh --apparent-size ./smallSorter
+	ld --relax --oformat binary -o smallSorter $^
 
-time: sorter
+smallSorterDebug: $(SMALL_OBJS)
+	ld --discard-all --relax --strip-all -N -o smallSorterDebug $^
+	
+smallSorterSize: smallSorter
+	du -sh --apparent-size $^
+	
+smallSorterDump: smallSorterDebug
+	objdump -d $^
+
+sorterTime: sorter
 	time ./sorter numbers.txt > /dev/null
 
 .PHONY: clean numbers

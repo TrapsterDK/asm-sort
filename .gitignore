@@ -3,3 +3,4 @@ src/smallSorter
 src/sorter.o
 src/sorter
 src/numbers*
+src/smallSorterDebug
