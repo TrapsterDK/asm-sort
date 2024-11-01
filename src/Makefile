@@ -20,8 +20,4 @@ time: sorter
 clean:
 	rm -f *.o sorter
 numbers:
-	for size in 10000 50000 100000 1000000 5000000; do \
-		for i in $$(seq 1 $$size); do \
-			echo "$$(shuf -i 0-32767 -n 1)\t$$(shuf -i 0-32767 -n 1)"; \
-		done > numbers-$$size.txt; \
-	done
+	python3 ./data.py
