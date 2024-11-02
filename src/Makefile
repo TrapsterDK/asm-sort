@@ -44,6 +44,6 @@ $(SMALL_SORTER)Debug: $(SMALL_SORTER).o
 
 .PHONY: clean numbers $(SMALL_SORTER_COMBINED).s
 clean:
-	rm -f *.o smallSorterCombined.s
+	rm -f *.o smallSorterCombined.s && find . -type f ! -name "*.*"  ! -name "Makefile" -exec rm -f {} +
 numbers:
 	python3 ./data.py $(NUMBERS)
