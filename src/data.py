@@ -1,3 +1,4 @@
+import sys
 import random
 
 
@@ -12,5 +13,6 @@ def create_random_number_file(filename: str, n: int) -> None:
 
 
 if __name__ == "__main__":
-    for i in [10_000, 50_000, 100_000, 1_000_000, 5_000_000, 10_000_000, 100_000_000]:
-        create_random_number_file(f"numbers_{i}.txt", i)
+    args = sys.argv[1:]
+    for i in args:
+        create_random_number_file(f"numbers_{i}.txt", int(i))

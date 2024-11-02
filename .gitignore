@@ -1,6 +1,7 @@
-src/smallSorter.o
 src/smallSorter
-src/sorter.o
 src/sorter
 src/numbers*
 src/smallSorterDebug
+src/smallSorterCombined.s
+src/.gdb_history
+src/*.o
