@@ -16,6 +16,8 @@ _start:
 
     # don't check if file was opened successfully
 
+    subq $(144 - 24), %rsp # space for fstat struct
+
     # fstat()
     movl $5, %eax
     movl %ebp, %edi         # file descriptor

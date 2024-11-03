@@ -8,9 +8,6 @@ SMALL_SORTER_COMBINED = smallSorterCombined
 .DEFAULT_GOAL := $(FAST_SORTER)
 .PHONY: clean numbers# $(SMALL_SORTER_COMBINED).s
 
-%.o: %.s
-	as -g -o $@ $^
-
 $(SMALL_SORTER_COMBINED).s:
 	sed -e '/%%MAIN_CODE%%/{r $(SMALL_SORTER).s' -e 'd}' "$(SMALL_HEADER).s" > "$(SMALL_SORTER_COMBINED).s"
 	
