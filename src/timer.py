@@ -12,10 +12,11 @@ def time_command(command: str, times: int) -> float:
         end = time.time()
 
         elapsed = end - start
-        total_time += elapsed
+        if i != 0:
+            total_time += elapsed
         print(f"Run {i + 1}: {elapsed:.6f} seconds")
 
-    average_time = total_time / times
+    average_time = total_time / (times - 1)
     print(f"Average time per run: {average_time:.6f} seconds")
 
 

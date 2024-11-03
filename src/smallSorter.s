@@ -10,9 +10,9 @@ _count:
     movq 16(%rsp), %rdi     # second console argument
     xorl %esi, %esi         # O_DONLY
     syscall
+    # don't check for open() errors
     movl %eax, %ebx         # save file descriptor
 
-    # don't check if file was opened successfully
 
 _line:
     xorl %ebp, %ebp         # set character counter
@@ -28,9 +28,10 @@ _scan:
     xorl %edx, %edx
     incl %edx               # read count
     syscall
+    # don't check for read() errors
 
     # check if end of file is reached (if read returns 0)
-    test %eax, %eax
+    testl %eax, %eax
     jz   _file_end
 
     movb (%rsp, %rbp), %al  # load char from buffer at character counter
@@ -48,10 +49,10 @@ _scan:
     js   _other
 
     # the character now must be a number from 0-9
-    # now check if the number is part of x or y
-    # this is done by checking the reached y flag
-    test %r14, %r14
-    jz   _scan
+    # now check if the character is a part of y by checking the reached y flag
+    testq %r14, %r14
+    jz   _scan              # number is x
+    # number now must be y
     
     imulq $10, %r13         # multiply y by 10
     addq %rax, %r13         # add new number to y
@@ -79,6 +80,7 @@ _other:
     movq %rsp, %rsi         # buffer on the stack
     movl %ebp, %edx         # character count
     syscall
+    # don't check for write() errors
     jmp  _line
 
 _file_end:
@@ -86,6 +88,7 @@ _file_end:
     xorb $3, %al            # eax is already 0 since read() returns 0 when end of file
     movl %ebx, %edi         # file descriptor
     syscall
+    # don't check for close() errors
 
     # increment as word because max allowed input number is 2^15-1
     # therfore allowing to check for overflow instead of having to compare with 32768

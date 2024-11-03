@@ -1,9 +1,12 @@
-NUMBERS = 1 10 100 1000 10000 100000 1000000 5000000 10000000
+NUMBERS = 1 10 100 1000 10000 100000 1000000 5000000 10000000 20000000 40000000
 FAST_SORTER = sorter
 SMALL_SORTER = smallSorter
 NUMBER_MAP = numberMap
 SMALL_HEADER = smallHeader
 SMALL_SORTER_COMBINED = smallSorterCombined
+
+.DEFAULT_GOAL := $(FAST_SORTER)
+.PHONY: clean numbers# $(SMALL_SORTER_COMBINED).s
 
 %.o: %.s
 	as -g -o $@ $^
@@ -15,8 +18,7 @@ $(SMALL_SORTER): $(SMALL_SORTER_COMBINED).s $(SMALL_SORTER_COMBINED).o
 	ld --relax --oformat binary -o $(SMALL_SORTER) $(SMALL_SORTER_COMBINED).o
 
 $(FAST_SORTER): $(NUMBER_MAP).o $(FAST_SORTER).o
-	ld -g -o $@ $^
-	# ld --discard-all --relax --strip-all -o $@ $^
+	ld --discard-all --relax --strip-all -o $@ $^
 	
 $(SMALL_SORTER)Debug: $(SMALL_SORTER).o
 	ld --discard-all --relax --strip-all -N -o $(SMALL_SORTER)Debug $(SMALL_SORTER).o
@@ -42,8 +44,8 @@ $(SMALL_SORTER)Debug: $(SMALL_SORTER).o
 %TestEmpty: %
 	./$^ empty-numbers.txt
 
-.PHONY: clean numbers $(SMALL_SORTER_COMBINED).s
 clean:
-	rm -f *.o smallSorterCombined.s && find . -type f ! -name "*.*"  ! -name "Makefile" -exec rm -f {} +
+	rm -f numbers_* *.o && find . -type f ! -name "*.*"  ! -name "Makefile" -exec rm -f {} +
+
 numbers:
 	python3 ./data.py $(NUMBERS)
